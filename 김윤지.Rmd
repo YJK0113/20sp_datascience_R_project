@@ -1,0 +1,267 @@
+---
+title: "Kim Yoon Ji"
+author: "Kim Yoon Ji"
+date: '2020 6 12 '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+```
+
+#Making Tendency Graph of countries in North America and South America that had rapid increase 
+```{r}
+#Kim Yoon Ji
+#Reading data and save it as 'data'
+data<-read.csv("GlobalLandTemperaturesByMajorCity.csv")
+
+#Remove NA values
+data %>% na.omit() 
+
+#Create a column that extracts year in date column, filter the 'data' from 1860-01-01 and save it as 'clean'
+clean <- data %>% mutate(When = as.Date(dt, format="%Y-%m-%d")) %>% filter(When >= as.Date("1860-01-01")) 
+
+#Filter 'clean' by season
+yclean <- clean %>% mutate(year = year(When), month = month(When), season = ifelse(month==3|month==4|month==5,'Spring', 'Summer' ))
+yclean$season <- ifelse(yclean$month==9| yclean$month==10| yclean$month==11 , 'Autumn',yclean$season )
+yclean$season <- ifelse(yclean$month==12| yclean$month==1| yclean$month==2 , 'Winter',yclean$season )
+```
+
+
+#I-1)Canada-Montreal (overall graph of Montreal's temperature from 1860 to 2013)
+```{r}
+#Kim Yoon Ji
+#Extract only Montreal temperature data from 'yclean' and remove NA values
+montreal <- yclean %>% filter(City=="Montreal") %>% na.omit()
+
+#Summarise annual average temperature and make a graph of it
+#Dark grey line represents the annual average temperature of Montreal, pink line shows average temperature throughout the period(1860~2013), and red line is the reference line of the annual average temperature.
+montreal %>% group_by(year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='Red', se=F, lwd=1.7)+
+  geom_hline(yintercept=mean(montreal$AverageTemperature), col='pink', lwd=1.3)+
+  labs(title = "Trend of the Yearly Average Temperature", subtitle="Montreal", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))
+```
+1)From 1980 to 1920, the temperature seems to rise quite rapidly and consistently.
+2)From 1920 to 1970, the temperature seems to rise slightly compared to other periods or have no significant increase. 
+3)From 1970 to 2013, the temperature increases drastically, even more than 1980~2013. 
+In 2000, Canada ranked ninth out of 186 countries in terms of per capita greenhouse gas emissions, and in 2005, it ranked eighth and in 2009, it ranked seventh. Even more, Canada was second for per capita emission. This fact can explain why the temperature rise dramatically throughout 1970 to 2013. Though Canada has very low popluation density, it has very high emission. Therefore, unlike other countries that has suffered from urbanization and population explosion, high rate of emission could be Canada's main reason for the temperature increase.
+#I-2)Canada-Montreal (temperature graph by season)
+```{r}
+#Kim Yoon Ji
+#Similar graph with above, but faceted with seasons (3~5: Spring, 6~8: Summer, 9~11: Autumn, 12~2: Winter)
+montreal %>% group_by(season, year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='light blue', se=F)+
+  labs(title = "Trend of the Yearly Average Temperature by Season", subtitle="Montreal", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))+
+  facet_wrap(~season)
+```
+
+
+#II-1)Canada-Toronto (overall graph of Toronto's temperature from 1860 to 2013)
+```{r}
+#Kim Yoon Ji
+#Extract only Toronto temperature data from 'yclean' and remove NA values
+toronto <- yclean %>% filter(City=="Toronto") %>% na.omit()
+
+#Summarise annual average temperature and make a graph of it
+#Dark grey line represents the annual average temperature of Toronto, pink line shows average temperature throughout the period(1860~2013), and red line is the reference line of the annual average temperature.
+toronto %>% group_by(year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='Red', se=F, lwd=1.7)+
+  geom_hline(yintercept=mean(toronto$AverageTemperature), col='pink', lwd=1.3)+
+  labs(title = "Trend of the Yearly Average Temperature", subtitle="Toronto", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))
+```
+#II-2) Canada-Toronto (temperature graph by season)
+```{r}
+#Kim Yoon Ji
+#Similar graph with above, but faceted with seasons (3~5: Spring, 6~8: Summer, 9~11: Autumn, 12~2: Winter)
+toronto %>% group_by(season, year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='light blue', se=F)+
+  labs(title = "Trend of the Yearly Average Temperature by Season", subtitle="Toronto", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))+
+  facet_wrap(~season)
+```
+Since Toronto is geographically close to Montreal and is same Country with Montreal, the backgroud and cause of the temperature change is simliar to Montreal.
+
+
+#III-1)U.S.-Chicago (overall graph of Chicago's temperature from 1860 to 2013)
+```{r}
+#Kim Yoon Ji
+#Extract only Chicago temperature data from 'yclean' and remove NA values
+chicago <- yclean %>% filter(City=="Chicago") %>% na.omit()
+
+#Summarise annual average temperature and make a graph of it
+#Dark grey line represents the annual average temperature of Chicago, pink line shows average temperature throughout the period(1860~2013), and red line is the reference line of the annual average temperature.
+chicago %>% group_by(year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='Red', se=F, lwd=1.7)+
+  geom_hline(yintercept=mean(chicago$AverageTemperature), col='pink', lwd=1.3)+
+  labs(title = "Trend of the Yearly Average Temperature", subtitle="Chicago", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))
+```
+The rate of warming in Chicago has markedly accelerated over the past few decades. However, between 1950 and 2010, the average temperature increased twice as quickly, and between 1980 and 2010, it increased three times as quickly as it did from 1900 to 2010. Warming has been more during winter. These trends are consistent with expectations of increased concentrations of heat-trapping gases and observed changes in concentrations of certain particles in the atmosphere.
+#III-2)U.S.-Chicago (temperature graph by season)
+```{r}
+#Kim Yoon Ji
+#Similar graph with above, but faceted with seasons (3~5: Spring, 6~8: Summer, 9~11: Autumn, 12~2: Winter)
+chicago %>% group_by(season, year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='light blue', se=F)+
+  labs(title = "Trend of the Yearly Average Temperature by Season", subtitle="Chicago", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))+
+  facet_wrap(~season)
+```
+Tempreature of Chicago increased in Autumn and Spring more than Summer and Winter. Also, the temperature in winter tends to fluctuate more than other seasons.
+
+
+#IV-1)Peru-Lima (overall graph of Lima's temperatrue from 1860 to 2013)
+```{r}
+#Kim Yoon Ji
+#Extract only Lima temperature data from 'yclean' and remove NA values
+lima <- yclean %>% filter(City=="Lima") %>% na.omit()
+
+#Summarise annual average temperature and make a graph of it
+#Dark grey line represents the annual average temperature of Lima, pink line shows average temperature throughout the period(1860~2013), and red line is the reference line of the annual average temperature.
+lima %>% group_by(year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='Red', se=F, lwd=1.7)+
+  geom_hline(yintercept=mean(lima$AverageTemperature), col='pink', lwd=1.3)+
+  labs(title = "Trend of the Yearly Average Temperature", subtitle="Lima", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))
+```
+Peru is one of the countries highly vulnerable to climate change, with many climate vulnerability characteristics recognized in the 1992 United Nations Framework Convention on Climate Change (UNFCCC), including low coastal zones; arid and semi-arid areas; exposure to floods and zones prone to natural disasters. The complex geography added to the deforestation of some areas was associated with altitudinal changes in habitat from vectors of Malaria and Chagas disease. For this reason, unlike cities which have encountered industrialization or urbanization have specific point that have significant changes in temperature graph, Lima's temperature rises constantly because of its complicate geographic circumstance.
+#IV-2)Lima (temperature graph by season)
+```{r}
+#Kim Yoon Ji
+#Similar graph with above, but faceted with seasons (3~5: Spring, 6~8: Summer, 9~11: Autumn, 12~2: Winter)
+lima %>% group_by(season, year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='light blue', se=F)+
+  labs(title = "Trend of the Yearly Average Temperature by Season", subtitle="Lima", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))+
+  facet_wrap(~season)
+```
+When we look at the graph of Lima by seasons, in Autumn and Summer, the temperature remained almost same until 1950s, but rose a bit after then. And in Spring and Winter, the temperature rose until 1940s and remained its status quo after then.
+
+
+#V-1)Brazil-São Paulo (overall graph of São Paulo's temperatrue from 1860 to 2013)
+```{r}
+#Kim Yoon Ji
+#Extract only São Paulo's temperature data from 'yclean' and remove NA values
+sp <- yclean %>% filter(City=="S찾o Paulo") %>% na.omit()
+
+#Summarise annual average temperature and make a graph of it
+#Dark grey line represents the annual average temperature of São Paulo, pink line shows average temperature throughout the period(1860~2013), and red line is the reference line of the annual average temperature.
+sp %>% group_by(year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='Red', se=F, lwd=1.7)+
+  geom_hline(yintercept=mean(sp$AverageTemperature), col='pink', lwd=1.3)+
+  labs(title = "Trend of the Yearly Average Temperature", subtitle="São Paulo", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))
+```
+#V-2)Brazil-São Paulo (temperature graph by season)
+```{r}
+#Kim Yoon Ji
+#Similar graph with above, but faceted with seasons (3~5: Spring, 6~8: Summer, 9~11: Autumn, 12~2: Winter)
+sp %>% group_by(season, year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='light blue', se=F)+
+  labs(title = "Trend of the Yearly Average Temperature by Season", subtitle="São Paulo", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))+
+  facet_wrap(~season)
+```
+#VI-2)Brazil-Rio de Janeiro (overall graph of Rio de Janeiro's temperatrue from 1860 to 2013)
+```{r}
+#Kim Yoon Ji
+#Extract only Rio de Janeiro's temperature data from 'yclean' and remove NA values
+rio <- yclean %>% filter(City=="Rio De Janeiro") %>% na.omit()
+
+#Summarise annual average temperature and make a graph of it
+#Dark grey line represents the annual average temperature of Rio de Janeiro, pink line shows average temperature throughout the period(1860~2013), and red line is the reference line of the annual average temperature.
+rio %>% group_by(year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='Red', se=F, lwd=1.7)+
+  geom_hline(yintercept=mean(rio$AverageTemperature), col='pink', lwd=1.3)+
+  labs(title = "Trend of the Yearly Average Temperature", subtitle="Rio de Janeiro", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))
+```
+#V-2)Brazil-Rio de Janeiro (temperature graph by season)
+```{r}
+#Kim Yoon Ji
+#Similar graph with above, but faceted with seasons (3~5: Spring, 6~8: Summer, 9~11: Autumn, 12~2: Winter)
+rio %>% group_by(season, year) %>% summarise(ave = mean(AverageTemperature)) %>% na.omit() %>% 
+  ggplot() + geom_line(col="dark grey") + aes(x=year, y=ave) + geom_smooth(col='light blue', se=F)+
+  labs(title = "Trend of the Yearly Average Temperature by Season", subtitle="Rio de Janeiro", x= "Date(year)", y="Temperature(C)")+
+  scale_x_continuous(breaks = seq(1860, 2013, 20))+
+  facet_wrap(~season)
+```
+As Brazil industrialized roughly from 1900s, the temperature graphs show the increase from 1900s. Though the industrialization is a factor of climate change, urban expansion is at least partly responsible. Between 1960 and 2015, Rio’s greater metropolitan area grew by roughly 7 million people and has seen development spread into areas that used to be rural or forested. Since common building materials like asphalt, steel, concrete, and brick retain more heat than vegetation, land development elevates surface and, to a lesser degree, air temperatures. Meanwhile, the vehicles, factories, and air conditioning units that come with urbanization pump even more heat into the urban atmosphere. Therefore, increased humaon activity due to population explosion and the consequence emission and heat can be the significant reason for Rio de Janeiro's climate change. São Paulo is also the city of Brazil and its geographical location is close to Rio de Janeiro, the reason for its climate change might not be different from Rio de Janeiro's.
+
+
+
+#Forecasting 2014~2020 temperature from the temperature between 2005~2013
+We used time-series and forecast packages to forecast future temperature by using past day's patterns.
+We made a graph of forecasted data and merged with the graph of actual temperature data measured between 2014 and 2020 May. 
+Then we compared those two graphs and saw the difference between them.
+
+```{r}
+library(forecast)
+```
+
+#Rio de Janeiro Forecasting
+```{r}
+#Read Rio de Janeiro's real temperature data and save it into 'rio_real'
+rio_real <- read.csv("Rio_Temp_2014_2020.csv")
+
+#Extract only "Rio de Janeiro's climate data of 'yclean' from 2005 and save it in 'rio'. Summarise average temperature of each year save the summary into 'rio_avgtemp'. Then make the 'AverageTemperature' column of 'rio' dataframe into time series and save it as 'rio.ts'. We made a time series in monthly frequency from 2005 to 2013.
+rio <- yclean %>% filter(City=="Rio De Janeiro" & year >= 2005) %>% na.omit() 
+rio_avgtemp <- summarise(group_by(rio, year), avg_temp = mean(AverageTemperature))
+rio.ts <- ts(rio$AverageTemperature, start = 2005, end = 2013, frequency = 12)
+
+#Make 'AverageTemperature' column of 'rio.real' dataframe and save it as 'Rrio.ts' as well.
+Rrio.ts <- ts(rio_real$AverageTemperature, start = 2013, end = 2020, frequency = 12)
+
+#I used average and seasonal naive model for forcasting, since our time series have seasonal repitition because we made the time series in monthly frequency.
+rio.train <- window(rio.ts, end = 2013)
+rio.average <- meanf(rio.train, h = 84)
+rio.snaive <- snaive(rio.train, h = 84)
+
+
+plot(rio.average, xlim = c(2005, 2020), ylim = c(17,31), main = "From 2005 Temperature Forecasting", sub = "Brazil - Rio De Janeiro", col = "dark grey") #Plotting graph of past temperature and average of all observations for all future predictions
+lines(rio.snaive$mean, col = "green", lty = 1, lwd = 1.5) #Draw a line of Snaive in green
+abline(lm(AverageTemperature~year, data = rio), col = "black") #draw a linear regression of past temperature data 'rio' in black.
+lines(Rrio.ts, col = "red", lwd = 2) #Add the real temperature data between 2014 and 2020 in red.
+lines(rio_avgtemp, col = "orange", lwd = 3) #Add annual average temperature of past temperature data in orange.
+legend(2005,22, c("RealTemp", "snaive", "reference line", "YearAvgTemp"), cex = 0.7, col = c("red", "green", "black", "orange"), pch = 1, lty = 1, lwd = 2) #Show the legend of each graph element.
+```
+The real data was usually lower than expeected, but higher than the expected climate only in 2018. This can mean that Rio’s climate has many fluctuation and differs from year to year, so its prediction missed with the real temperature.
+
+#Montreal Forecasting
+```{r}
+#Read Montreal's real temperature data and save it into 'montreal_real'
+montreal_real <- read.csv("Montreal_Temp_2014_2020.csv")
+
+#Extract only "Rio de Janeiro's climate data of 'yclean' from 2005 and save it in 'montreal'. Summarise average temperature of each year save the summary into 'montreal_avgtemp'. Then make the 'AverageTemperature' column of 'montreal' dataframe into time series and save it as 'montreal.ts'. We made a time series in monthly frequency from 2005 to 2013.
+montreal <- yclean %>% filter(City=="Montreal" & year >= 2005) %>% na.omit() 
+montreal_avgtemp <- summarise(group_by(montreal, year), avg_temp = mean(AverageTemperature))
+montreal.ts <- ts(montreal$AverageTemperature, start = 2005, end = 2013, frequency = 12)
+
+#Make 'AverageTemperature' column of 'montreal.real' dataframe and save it as 'Rmonreal.ts' as well.
+Rmontreal.ts <- ts(montreal_real$AverageTemperature, start = 2013, end = 2020, frequency = 12)
+
+#I used average and seasonal naive model for forcasting, since our time series have seasonal repitition because we made the time series in monthly frequency.
+montreal.train <- window(montreal.ts, end = 2013)
+montreal.average <- meanf(montreal.train, h = 84)
+montreal.snaive <- snaive(montreal.train, h = 84)
+
+plot(montreal.average, xlim = c(2005, 2020), ylim = c(-30,27), main = "From 2005 Temperature Forecasting", sub = "Montreal", col = "dark grey") #Plotting graph of past temperature and average of all observations for all future predictions
+lines(montreal.snaive$mean, col = "green", lty = 1, lwd = 1.5) #Draw a line of Snaive in green
+abline(lm(AverageTemperature~year, data = montreal), col = "black") #draw a linear regression of past temperature data 'montreal' in black.
+lines(Rmontreal.ts, col = "red", lwd = 2)  #Add the real temperature data between 2014 and 2020 in red.
+lines(montreal_avgtemp, col = "orange", lwd = 3) #Add annual average temperature of past temperature data in orange.
+legend(2005,-15, c("RealTemp", "snaive", "reference line", "YearAvgTemp"), cex = 0.6, col = c("red", "green", "black", "orange"), pch = 1, lty = 1, lwd = 2) #Show the legend of each graph element.
+```
+Our prediction was quite similar with what was real. Unlike Rio de Janeiro, Montreal's temperature seems to have less fluctuation, so the prediction was similar to the real temperature. 
+
+
+
